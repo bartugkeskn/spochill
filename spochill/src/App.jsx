@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import './index.css';
+import "./index.css";
 import LiveWallpaper from "./components/LiveWallpaper";
 
 function App() {
@@ -27,9 +27,15 @@ function App() {
   const [spotifyToken, setSpotifyToken] = useState(null);
 
   useEffect(() => {
-    // LocalStorage'dan token kontrolü
-    const token = localStorage.getItem("spotifyToken");
-    if (token) setSpotifyToken(token);
+    const hash = window.location.hash;
+    if (hash) {
+      const token = new URLSearchParams(hash.replace("#", "?")).get("access_token");
+      if (token) {
+        localStorage.setItem("spotifyToken", token);
+        setSpotifyToken(token);
+        window.location.hash = ""; // URL temizle
+      }
+    }
   }, []);
 
   const wallpapers = wallpaperCategories[currentCategory];
@@ -50,11 +56,15 @@ function App() {
   };
 
   const handleSpotifyLogin = () => {
-    const clientId = "39de6d0a3b564b70960490de0de7b3bb"; // Spotify Developer Dashboard'dan alınan client ID
-    const redirectUri = "https://spochill.vercel.app/"; // Spotify Developer Dashboard'da kayıtlı redirect URI
+    const clientId = "39de6d0a3b564b70960490de0de7b3bb"; 
+    const redirectUri = "https://spochill.vercel.app/"; // Spotify dashboardda eklediğin redirect URI
     const scopes = "user-read-playback-state user-modify-playback-state user-read-currently-playing";
-    const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scopes)}`;
-    window.open(authUrl, "_blank", "width=500,height=600");
+  
+    const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=token&redirect_uri=${encodeURIComponent(
+      redirectUri
+    )}&scope=${encodeURIComponent(scopes)}`;
+  
+    window.location.href = authUrl; // popup yerine direk yönlendirme
   };
 
   return (
@@ -67,15 +77,14 @@ function App() {
 
       {/* Player overlay */}
       <div className="player-overlay">
-      {!spotifyToken ? (
+        {!spotifyToken ? (
           <button onClick={handleSpotifyLogin}>Login with Spotify</button>
         ) : (
           <iframe
-            src="https://open.spotify.com/embed/track/TRACK_ID"
+            src="https://open.spotify.com/embed/track/4uLU6hMCjMI75M1A2tKUQC"
             width="300"
             height="80"
             frameBorder="0"
-            allowtransparency="true"
             allow="encrypted-media"
             title="Spotify Player"
           ></iframe>
@@ -84,15 +93,27 @@ function App() {
 
       {/* Wallpaper kontrol butonları */}
       <div className="wallpaper-buttons">
-        <button className="button" onClick={prevWallpaper}>◀</button>
-        <button className="button" onClick={() => setIsCategoryOpen(true)}>Kategori</button>
-        <button className="button" onClick={nextWallpaper}>▶</button>
+        <button className="button" onClick={prevWallpaper}>
+          ◀
+        </button>
+        <button className="button" onClick={() => setIsCategoryOpen(true)}>
+          Kategori
+        </button>
+        <button className="button" onClick={nextWallpaper}>
+          ▶
+        </button>
       </div>
 
       {/* Kategori Modal */}
       {isCategoryOpen && (
-        <div className="category-modal-backdrop" onClick={() => setIsCategoryOpen(false)}>
-          <div className="category-modal-content" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="category-modal-backdrop"
+          onClick={() => setIsCategoryOpen(false)}
+        >
+          <div
+            className="category-modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
             {Object.keys(wallpaperCategories).map((category) => (
               <button key={category} onClick={() => selectCategory(category)}>
                 {category}
