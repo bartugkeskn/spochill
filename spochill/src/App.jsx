@@ -50,10 +50,10 @@ function App() {
   };
 
   const handleSpotifyLogin = () => {
-    const clientId = "39de6d0a3b564b70960490de0de7b3bb"; // Kendi client ID
-    const redirectUri = "https://spochill.vercel.app/"; // Canlı URL
+    const clientId = "39de6d0a3b564b70960490de0de7b3bb"; // Spotify Developer Dashboard'dan alınan client ID
+    const redirectUri = "https://spochill.vercel.app/"; // Spotify Developer Dashboard'da kayıtlı redirect URI
     const scopes = "user-read-playback-state user-modify-playback-state user-read-currently-playing";
-    const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=token&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scopes)}`;
+    const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scopes)}`;
     window.open(authUrl, "_blank", "width=500,height=600");
   };
 
@@ -67,13 +67,11 @@ function App() {
 
       {/* Player overlay */}
       <div className="player-overlay">
-        {!spotifyToken ? (
-          <button onClick={handleSpotifyLogin} className="spotify-login-btn">
-            Login with Spotify
-          </button>
+      {!spotifyToken ? (
+          <button onClick={handleSpotifyLogin}>Login with Spotify</button>
         ) : (
           <iframe
-            src="https://open.spotify.com/embed/track/TRACK_ID" // Buraya istediğin track ID
+            src="https://open.spotify.com/embed/track/TRACK_ID"
             width="300"
             height="80"
             frameBorder="0"
