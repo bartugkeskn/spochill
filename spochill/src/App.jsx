@@ -1,7 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import './index.css';
 import LiveWallpaper from "./components/LiveWallpaper";
-import Player from "./components/Player";
 
 function App() {
   const wallpaperCategories = {
@@ -23,7 +22,15 @@ function App() {
   const [currentCategory, setCurrentCategory] = useState("Landscape");
   const [currentWallpaper, setCurrentWallpaper] = useState(0);
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(true);
+
+  // Spotify token state
+  const [spotifyToken, setSpotifyToken] = useState(null);
+
+  useEffect(() => {
+    // LocalStorage'dan token kontrolü
+    const token = localStorage.getItem("spotifyToken");
+    if (token) setSpotifyToken(token);
+  }, []);
 
   const wallpapers = wallpaperCategories[currentCategory];
   const wallpapersCount = wallpapers.length;
@@ -42,6 +49,14 @@ function App() {
     setIsCategoryOpen(false);
   };
 
+  const handleSpotifyLogin = () => {
+    const clientId = "39de6d0a3b564b70960490de0de7b3bb"; // Kendi client ID
+    const redirectUri = "https://spochill.vercel.app/callback"; // Canlı URL
+    const scopes = "user-read-playback-state user-modify-playback-state user-read-currently-playing";
+    const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=token&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scopes)}`;
+    window.location.href = authUrl;
+  };
+
   return (
     <div className="app-container">
       {/* Arkaplan */}
@@ -50,19 +65,24 @@ function App() {
         wallpapers={wallpapers}
       />
 
-      {/* Player overlay (şu an örnek, senin player state’in eklenmeli) */}
+      {/* Player overlay */}
       <div className="player-overlay">
-        <iframe
-          src="https://open.spotify.com/embed/track"
-          width="300"
-          height="80"
-          frameBorder="0"
-          allowtransparency="true"
-          allow="encrypted-media"
-          title="Spotify Player"
-        ></iframe>
+        {!spotifyToken ? (
+          <button onClick={handleSpotifyLogin} className="spotify-login-btn">
+            Login with Spotify
+          </button>
+        ) : (
+          <iframe
+            src="https://open.spotify.com/embed/track/TRACK_ID" // Buraya istediğin track ID
+            width="300"
+            height="80"
+            frameBorder="0"
+            allowtransparency="true"
+            allow="encrypted-media"
+            title="Spotify Player"
+          ></iframe>
+        )}
       </div>
-
 
       {/* Wallpaper kontrol butonları */}
       <div className="wallpaper-buttons">
