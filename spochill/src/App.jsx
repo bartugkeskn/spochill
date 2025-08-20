@@ -54,7 +54,7 @@ function App() {
     const redirectUri = "https://spochill.vercel.app/"; // Canlı URL
     const scopes = "user-read-playback-state user-modify-playback-state user-read-currently-playing";
     const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=token&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scopes)}`;
-    window.location.href = authUrl;
+    window.open(authUrl, "_blank", "width=500,height=600");
   };
 
   return (
