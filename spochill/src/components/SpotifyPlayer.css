@@ -1,0 +1,41 @@
+.spotify-player {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 300px;
+  background: rgba(0, 0, 0, 0.75);
+  color: white;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-radius: 10px;
+  gap: 10px;
+  font-family: sans-serif;
+}
+
+.spotify-player img {
+  width: 60px;
+  height: 60px;
+  border-radius: 5px;
+}
+
+.spotify-track-info {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.spotify-track-name {
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.spotify-track-artists {
+  font-size: 0.9rem;
+  color: #ccc;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

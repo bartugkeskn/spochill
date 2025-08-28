@@ -1,39 +1,55 @@
 import { useState, useEffect } from "react";
 import "./index.css";
 import LiveWallpaper from "./components/LiveWallpaper";
+import SpotifyPlayer from "./components/SpotifyPlayer";
 
 function App() {
   const wallpaperCategories = {
-    Landscape: ["/live-wallpapers/landscape1.mp4", "/live-wallpapers/landscape2.mp4"],
-    Space: ["/live-wallpapers/space1.mp4", "/live-wallpapers/space2.mp4", "/live-wallpapers/space3.mp4"],
-    Cyberpunk: ["/live-wallpapers/cyberpunk1.mp4", "/live-wallpapers/cyberpunk2.mp4"],
+    Landscape: [
+      "/live-wallpapers/landscape1.mp4",
+      "/live-wallpapers/landscape2.mp4",
+    ],
+    Space: [
+      "/live-wallpapers/space1.mp4",
+      "/live-wallpapers/space2.mp4",
+      "/live-wallpapers/space3.mp4",
+    ],
+    Cyberpunk: [
+      "/live-wallpapers/cyberpunk1.mp4",
+      "/live-wallpapers/cyberpunk2.mp4",
+    ],
   };
 
   const [currentCategory, setCurrentCategory] = useState("Landscape");
   const [currentWallpaper, setCurrentWallpaper] = useState(0);
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
-
   const [spotifyToken, setSpotifyToken] = useState(null);
 
-  // URL'den token yakala
+  // URL'den token al ve localStorage'a kaydet
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const token = params.get("access_token");
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get("access_token");
     if (token) {
       localStorage.setItem("spotifyToken", token);
       setSpotifyToken(token);
-      window.history.replaceState({}, document.title, "/"); // URL temizle
+      window.history.replaceState({}, document.title, "/");
     } else {
-      const storedToken = localStorage.getItem("spotifyToken");
-      if (storedToken) setSpotifyToken(storedToken);
+      const savedToken = localStorage.getItem("spotifyToken");
+      if (savedToken) setSpotifyToken(savedToken);
     }
   }, []);
 
   const wallpapers = wallpaperCategories[currentCategory];
   const wallpapersCount = wallpapers.length;
 
-  const nextWallpaper = () => setCurrentWallpaper((prev) => (prev + 1) % wallpapersCount);
-  const prevWallpaper = () => setCurrentWallpaper((prev) => (prev - 1 + wallpapersCount) % wallpapersCount);
+  const nextWallpaper = () => {
+    setCurrentWallpaper((prev) => (prev + 1) % wallpapersCount);
+  };
+
+  const prevWallpaper = () => {
+    setCurrentWallpaper((prev) => (prev - 1 + wallpapersCount) % wallpapersCount);
+  };
+
   const selectCategory = (category) => {
     setCurrentCategory(category);
     setCurrentWallpaper(0);
@@ -41,40 +57,40 @@ function App() {
   };
 
   const handleSpotifyLogin = () => {
-    // Backend login endpoint
-    window.location.href = "http://localhost:8888/login";
+    window.location.href = "http://127.0.0.1:8888/login"; // Backend login endpoint
   };
 
   return (
     <div className="app-container">
-      <LiveWallpaper currentWallpaper={currentWallpaper} wallpapers={wallpapers} />
+      <LiveWallpaper
+        currentWallpaper={currentWallpaper}
+        wallpapers={wallpapers}
+      />
 
-      <div className="player-overlay">
-        {!spotifyToken ? (
+      {/* Spotify Player */}
+      {spotifyToken ? (
+        <SpotifyPlayer token={spotifyToken} />
+      ) : (
+        <div className="player-overlay">
           <button onClick={handleSpotifyLogin}>Login with Spotify</button>
-        ) : (
-          <iframe
-            src="https://open.spotify.com/embed/track/4uLU6hMCjMI75M1A2tKUQC"
-            width="300"
-            height="80"
-            frameBorder="0"
-            allow="encrypted-media"
-            title="Spotify Player"
-          ></iframe>
-        )}
-      </div>
+        </div>
+      )}
 
+      {/* Wallpaper kontrol butonları */}
       <div className="wallpaper-buttons">
         <button className="button" onClick={prevWallpaper}>◀</button>
         <button className="button" onClick={() => setIsCategoryOpen(true)}>Kategori</button>
         <button className="button" onClick={nextWallpaper}>▶</button>
       </div>
 
+      {/* Kategori Modal */}
       {isCategoryOpen && (
         <div className="category-modal-backdrop" onClick={() => setIsCategoryOpen(false)}>
           <div className="category-modal-content" onClick={(e) => e.stopPropagation()}>
             {Object.keys(wallpaperCategories).map((category) => (
-              <button key={category} onClick={() => selectCategory(category)}>{category}</button>
+              <button key={category} onClick={() => selectCategory(category)}>
+                {category}
+              </button>
             ))}
           </div>
         </div>
